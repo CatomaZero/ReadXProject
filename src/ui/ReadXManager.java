@@ -6,7 +6,13 @@ import java.util.Calendar;
 public class ReadXManager{
 	private ReadXCompany readx;
 	private Scanner lector;
-	
+	/**
+	* Constructor ReadXManager: Initializes a new instance of the class with the specified parameters.
+	*
+	* <br>Preconditions:<br>None.
+	* 
+	* <br>Postconditions:<br> A new instance of the ReadXManager class is created with the specified parameters.
+	*/
 	public ReadXManager(){
 		readx=new ReadXCompany("ReadX", "00399905");
 		lector= new Scanner(System.in);
@@ -16,6 +22,13 @@ public class ReadXManager{
 		
 		objReadX.menu();
 	}
+	/**
+	*Menu: Displays a menu with several options and executes the *corresponding method based on the user's selection.
+	*
+	*<br>preconditions:<br> A ReadXManager object has been created.
+	*
+	*<br>postconditions:<br> The corresponding method is executed based on the *user's selection.
+	*/
 	public void menu(){
 		boolean status=true;
 		int op;
@@ -56,7 +69,14 @@ public class ReadXManager{
 					status=false;
 			}
 		}			
-	}
+	}	
+	/**
+	* The method manages bibliographic products based on user input.
+	*
+	* <br>Preconditions:<br> None.
+	*
+	* <br>Postconditions:<br> Based on the user input, the method either registers, modifies or deletes bibliographic products.
+	*/
 	public void manageBibliographic(){
 		int op;
 		System.out.println("What you want to do:\n1.Register.\n2.Modify.\n3.Delete.");
@@ -75,6 +95,14 @@ public class ReadXManager{
 				System.out.println("Select a valid option");
 		}
 	}
+	/**
+	*Method registerBibliographic: Registers a new bibliographic product.
+	*
+	*<br>Preconditions:<br> None.
+	*
+	*<br>Postconditions:<br> A new bibliographic product is registered and
+	*added to the ReadX's catalog.
+	*/
 	public void registerBibliographic(){
 		String indentifier;
 		String name;
@@ -146,11 +174,21 @@ public class ReadXManager{
 			
 		}
 	}
+	/**
+	* Modifies a bibliographic product's name or price.
+	*
+	* <br>Preconditions:<br> None.
+	*
+	* <br>Postconditions:<br> If the specified bibliographic product is 	found, its name or price is modified
+	* as requested and a message indicating success or failure is printed. If the product is not found,
+	* an error message is printed.
+	*
+	*/
 	public void modifyBibliographic(){
 		String indentifier;
 		int op;
 		String newName;
-		Double newPrice;
+		double newPrice;
 		System.out.println("Enter the identifier of the bibliographic product that you want to modify");
 		indentifier=lector.next();
 		if(readx.searchProduct(indentifier)!=null){
@@ -171,12 +209,29 @@ public class ReadXManager{
 			System.out.println("Bibliographic product not founded");
 		}
 	}
+	/**
+	* Delete bibliographic: Deletes a bibliographic product from the ReadX catalog.
+	*
+	* <br>Preconditions:<br> None.
+	*
+	* <br>Postconditions:<br> If the specified bibliographic product is found, it is deleted from the catalog
+	* and a message indicating success is printed. If the product is not found, an error message is printed.
+	*/
 	public void deleteBibliographic(){
 		System.out.println("Enter the identifier of the bibliographic product that you want to delete");
 		String indentifier=lector.next();
 		
 		System.out.println(readx.deleteBibliographic(indentifier));
 	}
+	/**
+	* User Register: Registers a new user in the ReadX system.
+	*
+	* <br>Preconditions:<br> None.
+	*
+	* <br>Postconditions:<br> If the user's data is valid and the registration is successful, a message
+	* indicating success is printed. Otherwise, an error message is 	printed.
+	*
+	*/
 	public void userRegister(){
 		int typeUser=0;
 		String nameUser;
@@ -215,6 +270,14 @@ public class ReadXManager{
 		}
 		
 	}
+	/**
+	* Acquire products: Allows a user to acquire a bibliographic product.
+	*
+	* <br>Preconditions:<br> None.
+	*
+	* <br>Postconditions:<br> If the user and product are found and the acquisition is successful, a message
+	* indicating success is printed. Otherwise, an error message is printed.
+	*/
 	public void acquireProducts(){
 		System.out.println("Enter the id of the user who wishes to acquire a bibliographic product ");
 		String idUser=lector.next();
@@ -227,6 +290,14 @@ public class ReadXManager{
 			System.out.println("User not founded");
 		}
 	}
+	/**
+	* Finished Suscriptions: Allows a user to end a subscription to a magazine.
+	*
+	* <br>Preconditions:<br> None.
+	*
+	* <br>Postconditions:<br> If the user and magazine are found and the subscription is successfully
+	* cancelled, a message indicating success is printed. Otherwise, an error message is printed.
+	*/
 	public void finishSuscription(){
 		System.out.println("Enter the id of the user who wants to end a subscription");
 		String idUser=lector.next();
@@ -239,6 +310,17 @@ public class ReadXManager{
 			System.out.println("User not founded");
 		}
 	}
+	/**
+	* Library products: Displays the library of a user and allows them to interact with it.
+	*
+	* <br> Preconditions:<br> The user with the specified ID must exist in ReadX's database.
+	*
+	* <br> Postconditions:<br> Displays the user's library and allows them to perform the following actions:
+	* 1. View bibliographic products in the library.
+	* 2. Return a borrowed bibliographic product.
+	* 3. Exit the library.
+	*
+	*/
 	public void productsLibrary(){
 		System.out.println("Enter the id of the person who wants to see the library THIS METHOD IS NOT FINISHED ALREADY");
 		String idUser=lector.next();
@@ -257,6 +339,16 @@ public class ReadXManager{
 			System.out.println("User not founded");
 		}
 	}
+	/**
+	* Generate objects: Generates a new bibliographic product or user object based on user input.
+	*
+	* <br>Preconditions:<br> None.
+	*
+	* <br>Postconditions:<br> If the user selects 1, a new bibliographic product is generated
+	* using the generateBiliographicProduct method. If the user selects 2, a new user is
+	* generated using the generateUser method.
+	*
+	*/
 	public void generateObjects(){
 		boolean exit=true;
 		int op=0;
@@ -275,6 +367,14 @@ public class ReadXManager{
 			generateUser();
 		}
 	}
+	/**
+	* Generate product bibliographic automatically: Generates a new bibliographic product based on user input.
+	*
+	* <br>Preconditions:<br> None.
+	*
+	* <br>Postconditions:<br> A new bibliographic product is generated and returned as a string.
+	*
+	*/
 	public void generateBiliographicProduct(){
 		int opbibliographic=0;
 		boolean exit=true;
@@ -289,6 +389,14 @@ public class ReadXManager{
 		}
 		System.out.println(readx.generateBiliographicProduct(opbibliographic));
 	}
+	/** 
+	* Generate users automatically: Generates a new user based on user input(user's type).
+	*
+	* <br>Preconditions:<br> None.
+	*
+	* <br>Postconditions:<br> A new user is generated and returned as a string.
+	*
+	*/
 	public void generateUser(){
 		int opusers=0;
 		boolean exit=true;
@@ -303,6 +411,15 @@ public class ReadXManager{
 		}
 		System.out.println(readx.generateUser(opusers));
 	}
+	/**
+	*
+	*Simulate readings:Simulates a user reading a bibliographic product.
+	*
+	*<br>Preconditions:<br> The user must exist in the ReadX system.
+	*
+	*<br>Postconditions:<br> The user is able to read the selected *bibliographic product.
+	*
+	*/
 	public void simulateReading(){
 		System.out.println("Enter the id of the user who wants to do the reading");
 		String idUser=lector.next();
@@ -322,7 +439,7 @@ public class ReadXManager{
 					boolean reading=true;
 					while(reading){
 						System.out.println(readx.simulateReading(idUser,opString));
-						pag=readx.count(op,pag);
+						pag=readx.count(op,pag,opString); 
 						System.out.println(readx.countSimulateReading(idUser, opString,pag)+"\nEnter 1 to go to the previous page.\nEnter 2 to go to the next page.\nEnter 3 to return to library.");
 						op=lector.nextInt();
 						if(op==3){
