@@ -431,23 +431,25 @@ public class ReadXManager{
 				String opString=lector.next();
 				if(opString.equalsIgnoreCase("E")){
 					library=false;
-				}
-				if(readx.searchAcquireProduct(opString,idUser)){
-					System.out.println("Reading initialized\n");
-					int op=2;
-					int pag=0;
-					boolean reading=true;
-					while(reading){
-						System.out.println(readx.simulateReading(idUser,opString));
-						pag=readx.count(op,pag,opString); 
-						System.out.println(readx.countSimulateReading(idUser, opString,pag)+"\nEnter 1 to go to the previous page.\nEnter 2 to go to the next page.\nEnter 3 to return to library.");
-						op=lector.nextInt();
-						if(op==3){
-							reading=false;
-						}
-					}
 				}else{
-					System.out.println("This product has not been purchased yet");
+					if(readx.searchAcquireProduct(opString,idUser)){
+						System.out.println("Reading initialized\n");
+						int op=2;
+						int pag=0;
+						boolean reading=true;
+						while(reading){
+							System.out.println(readx.simulateReading(idUser,opString));
+							pag=readx.count(op,pag,opString); 
+							System.out.println(readx.countSimulateReading(idUser, opString,pag)+"\nEnter 1 to go to the previous page.\nEnter 2 to go to the next page.\nEnter 3 to return to library.");
+							op=lector.nextInt();
+							if(op==3){
+								reading=false;
+							}
+						}
+					}else{
+						System.out.println("This product has not been purchased yet");
+					}
+					
 				}
 			}
 		}else{

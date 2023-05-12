@@ -360,11 +360,9 @@ public class ReadXCompany{
 		boolean done;
 		String alert="";
 		if(product!=null&&product instanceof Magazine){
-			Magazine obj=(Magazine) product;
 			done=user.finishSuscription(product);
 			if(done){
 				alert="The suscription to "+product.getName()+" was finished sucesfully";
-				obj.eliminatedSuscription();
 			}else{
 				alert="You have not a suscription to "+product.getName();
 			}
@@ -484,14 +482,13 @@ public class ReadXCompany{
 	* @return A string representing a randomly generated identifier for a bibliographic product.
 	*/
 	public String generateRandomIndentifier(){
-		String indentifier="";
 		Random random = new Random();
-		int randomNumber = random.nextInt(10);
-		String randomNumberAsString = Integer.toString(randomNumber);
-		char randomLetter = (char) (random.nextInt(26) + 'A');
-		char randomLetter2 = (char) (random.nextInt(26) + 'A');
-		indentifier=randomLetter+randomNumberAsString+randomLetter2;
-		return indentifier;
+		int randomNum = random.nextInt(0xFFF) + 1;
+		String hexCode = Integer.toHexString(randomNum).toUpperCase(); 
+		while(hexCode.length() < 3) { 
+		hexCode = "0" + hexCode;
+		}
+		return hexCode;
 	}
 	/**
 	* Generate random product's number of pages: Generates a random number of pages for a bibliographic product.
