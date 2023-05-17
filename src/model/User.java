@@ -14,7 +14,7 @@ public class User{
 	protected boolean adds;
 	
 	//Relations
-	private ArrayList<BibliographicProduct> purchasedProducts;
+	private ArrayList<Section> library;
 	private ArrayList<Billing> billings;
 	
 	/**
@@ -36,7 +36,9 @@ public class User{
 		magazinesSubscribed=0;
 		adds=true;
 		
-		purchasedProducts=new ArrayList <BibliographicProduct>();
+		library=new ArrayList <Section>();
+		Section newSection=new Section(1);
+		library.add(newSection);
 		billings=new ArrayList <Billing>();
 	}
 	/**
@@ -102,26 +104,6 @@ public class User{
 		return nameUser+"   "+idUser+"   "+timeStamp.format(registerDate.getTime())+"   "+userType;
 	}
 	/**
-	* Search a bibliographic product acquire: Searches for a purchased BibliographicProduct with the same identifier as the specified BibliographicProduct.
-	*
-	* <br>Postconditions:<br> If a purchased BibliographicProduct with the same identifier as the specified BibliographicProduct is found, it is returned.
-	*
-	* @param product The BibliographicProduct to search for.
-	*
-	* @return The purchased BibliographicProduct with the same identifier as the specified BibliographicProduct, or null if none is found.
-	*/
-	public BibliographicProduct searchPurshased(BibliographicProduct product){
-		BibliographicProduct obj=null;
-		boolean created=false;
-		for(int i=0; i<purchasedProducts.size()&&!created;i++){
-			if(purchasedProducts.get(i)!=null&&product.getIndentifier().equalsIgnoreCase(purchasedProducts.get(i).getIndentifier())){
-				obj=purchasedProducts.get(i);
-				created=true;
-			}
-		}
-		return obj;
-	}
-	/**
 	* Acquire a new product: Acquires a new bibliographic product, creates a new billing, and adds them to the user's list of purchases and billings.
 	*
 	* @param product The bibliographic product to be acquired.
@@ -129,9 +111,17 @@ public class User{
 	* @param transactionDate The date of the transaction when the bibliographic product was acquired.
 	*/
 	public void acquireProducts(BibliographicProduct product, double price, Calendar transactionDate){
-		Billing newBilling=new Billing(transactionDate,price);
-		billings.add(newBilling);
-		purchasedProducts.add(product);
+		boolean created=false;
+		for(int i=0; i<library.size()&&!created;i++){
+			if(sectionVerification()){
+				Billing newBilling=new Billing(transactionDate,price);
+				billings.add(newBilling);
+				library.get(i).acquireProuct(product);
+				created=true;
+			}else{
+				createSection();
+			}
+		}
 	}
 	/**
 	* Finished a magazine's subscription: Removes the given bibliographic product from the list of purchased products.
@@ -144,12 +134,13 @@ public class User{
 	* @return true if the product was successfully removed from the list, false otherwise.
 	*/
 	public boolean finishSuscription(BibliographicProduct product){
-		boolean done;
-		if(searchPurshased(product)!=null){
-			purchasedProducts.remove(product);
-			done=true;
-		}else{
-			done=false;
+		boolean done=false;
+		if(searchAcquireProduct(product)!=null){
+			for(int i=0; i<library.size()&&!done;i++){
+				if(library.get(i)!=null){
+					done=library.get(i).finishSuscription(product);
+				}
+			}
 		}
 		return done;
 	}
@@ -162,9 +153,9 @@ public class User{
 	*/
 	public String productsLibrary(){
 		String alert="";
-		for(int i=0;i<purchasedProducts.size();i++){
-			if(purchasedProducts!=null){
-				alert+=purchasedProducts.get(i).getIndentifier()+"\n";
+		for(int i=0;i<library.size();i++){
+			if(library!=null){
+				alert+=library.get(i).productsLibrary();
 			}
 		}
 		alert+="Enter E to exit";
@@ -230,31 +221,12 @@ public class User{
 	public String simulateReading(BibliographicProduct product){
 		String alert="";
 		boolean searched=false;
-		for(int i=0;i<purchasedProducts.size()&&!searched;i++){
-			if(purchasedProducts.get(i)!=null&&searchAcquireProduct(product)!=null){
+		for(int i=0;i<library.size()&&!searched;i++){
+			if(library.get(i)!=null){
 				searched=true;
-				alert="Reading session in progress:\n\nReading:"+product.getName()+"\n";
+				alert=library.get(i).simulateReading(product);
 			}
 		}
-		return alert;
-	}
-	/**
-	* Count the pages of the reading simulation: Counts the pages read during a simulated reading session of the given bibliographic product.
-	*
-	* <br>Preconditions:<br> A bibliographic product and a page number must be passed as parameters.
-	*
-	* <br>Postconditions:<br> A string indicating the current page being read is returned.
-	*
-	* @param product A BibliographicProduct object representing the product being read.
-	* @param pag An integer representing the current page being read.
-	*
-	* @return A string indicating the current page being read, or an empty string if the product is not found in the list of purchased products.
-	*/
-	public String countSimulateReading(BibliographicProduct product,int pag){
-		String alert="";
-		boolean changed=false;
-		BibliographicProduct acquire=searchAcquireProduct(product);
-		alert="Reading page "+pag+" of "+acquire.getPagesNumber()+"\n";
 		return alert;
 	}
 	/**
@@ -271,32 +243,31 @@ public class User{
 	public BibliographicProduct searchAcquireProduct(BibliographicProduct product){
 		BibliographicProduct obj=null;
 		boolean created=false;
-		for(int i=0; i<purchasedProducts.size()&&!created;i++){
-			if(purchasedProducts.get(i)!=null&&product.getIndentifier().equalsIgnoreCase(purchasedProducts.get(i).getIndentifier())){
-				obj=purchasedProducts.get(i);
-				created=true;
+		for(int i=0; i<library.size()&&!created;i++){
+			if(library.get(i)!=null){
+				obj=library.get(i).searchPurshased(product);
+				if(obj!=null){
+					created=true;
+				}
 			}
 		}
 		return obj;
 	}
-	/**
-	* Comprobation of user's acquire products: Determines if the given bibliographic product has been purchased by the user.
-	*
-	* <br>Preconditions:<br> A bibliographic product must be passed as a parameter.
-	*
-	* <br>Postconditions:<br> A boolean indicating whether or not the product has been purchased is returned.
-	*
-	* @param product A BibliographicProduct object representing the product to check for purchase.
-	*
-	* @return A boolean indicating whether or not the product has been purchased.
-	*/
-	public boolean acquireProuct(BibliographicProduct product){
-		boolean acquire;
-		if(searchAcquireProduct(product)!=null){
-			acquire=true;
-		}else{
-			acquire=false;
+	public boolean sectionVerification(){
+		boolean perm=false;
+		for(int i=0; i<library.size()&&!perm;i++){
+			perm=library.get(i).sectionVerification();
 		}
-		return acquire;
+		return perm;
+	}
+	public void createSection(){
+		int con=0;
+		for(int i=0; i<library.size();i++){
+			if(library.get(i)!=null){
+				con=library.get(i).getSectionNumber();
+			}
+		}
+		Section newSection=new Section(con);
+		library.add(newSection);
 	}
 }

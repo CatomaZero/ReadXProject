@@ -33,7 +33,7 @@ public class ReadXCompany{
 	*Regist a book: Registers a new bibliographic product with the specified parameters.
 	*<br>Preconditions:<br> None.
 	*<br>Postconditions:<br> If the specified identifier does not already exist, a new Book object is created and added to the ReadX company's list of bibliographic products.
-	*@param identifier The identifier for the new bibliographic product.
+	*@param indentifier The identifier for the new bibliographic product.
 	*@param name The name of the new bibliographic product.
 	*@param pagesNumber The number of pages in the new bibliographic product.
 	*@param publicationDate The publication date of the new bibliographic product.
@@ -60,7 +60,7 @@ public class ReadXCompany{
 	*
 	*Regist a magazine: Registers a new bibliographic product with the specified parameters.
 	*<br>Postconditions:<br> If the specified identifier does not already exist, a new Magazine object is created and added to the ReadX company's list of bibliographic products.
-	*@param identifier The identifier for the new bibliographic product.
+	*@param indentifier The identifier for the new bibliographic product.
 	*@param name The name of the new bibliographic product.
 	*@param pagesNumber The number of pages in the new bibliographic product.
 	*@param publicationDate The publication date of the new bibliographic product.
@@ -278,29 +278,33 @@ public class ReadXCompany{
 			alert=obj2.addAppearance()+"\n";
 		}
 		if(product!=null){
-			if(userVerification(user)){
-				if(product instanceof Book){
-					Book obj=(Book) product;
-					obj.addSold();
-					price=obj.getValue();
-					transactionDate=Calendar.getInstance();
-					user.acquireProducts(product,price,transactionDate);
-					alert+="The book "+product.getName()+ " was added to your library sucesfully.\nAlso, we generated a billing with the price "+price;
-					count=1;
-				}else if(product instanceof Magazine){
-					Magazine obj=(Magazine) product;
-					obj.addSuscription();
-					price=obj.getSuscriptionValue();
-					transactionDate=Calendar.getInstance();
-					user.acquireProducts(product,price,transactionDate);
-					alert+="The magazine "+product.getName()+ " suscription was added to your library sucesfully\nAlso, we generated a billing with the price " + price;
-					count=2;
-				}
-				if(user instanceof Regular&&userVerification(user)){
-					updateRegularUser(count,user);
+			if(!searchAcquireProduct(indentifier,idUser)){
+				if(userVerification(user)){
+					if(product instanceof Book){
+						Book obj=(Book) product;
+						obj.addSold();
+						price=obj.getValue();
+						transactionDate=Calendar.getInstance();
+						user.acquireProducts(product,price,transactionDate);
+						alert+="The book "+product.getName()+ " was added to your library sucesfully.\nAlso, we generated a billing with the price "+price;
+						count=1;
+					}else if(product instanceof Magazine){
+						Magazine obj=(Magazine) product;
+						obj.addSuscription();
+						price=obj.getSuscriptionValue();
+						transactionDate=Calendar.getInstance();
+						user.acquireProducts(product,price,transactionDate);
+						alert+="The magazine "+product.getName()+ " suscription was added to your library sucesfully\nAlso, we generated a billing with the price " + price;
+						count=2;
+					}
+					if(user instanceof Regular&&userVerification(user)){
+						updateRegularUser(count,user);
+					}
+				}else{
+					alert="A regular user cannot buy more than 5 books and subscribe to 2 magazines. You already have " + obj2.getBooksPurchased() +" books and "+ obj2.getMagazinesSubscribed() +" magazines";
 				}
 			}else{
-				alert="A regular user cannot buy more than 5 books and subscribe to 2 magazines. You already have " + obj2.getBooksPurchased() +" books and "+ obj2.getMagazinesSubscribed() +" magazines";
+				alert="You cannot add a product that you already have";
 			}
 		}else{
 			alert="Bibliographic product not founded";
@@ -384,7 +388,7 @@ public class ReadXCompany{
 	public String productsLibrary(String idUser){
 		String alert="";
 		User user=searchUser(idUser);
-		alert+="\n"+user.getName()+"'s library\n";
+		alert="\n"+user.getName()+"'s library\n";
 		alert+=user.productsLibrary();
 		return alert;
 	}
@@ -406,7 +410,7 @@ public class ReadXCompany{
 		if(opbi==1){
 			Book newbook=new Book(indentifier,name,pagesNumber,publicationDate,"RandomBooks.com","Random review, random review",2,50,1);
 			bibliographic.add(newbook);
-			alert="A random book was register sucesfully with the follow data:\nIndentifier: "+indentifier+"\nName:"+name+"\nNumber of pages: "+pagesNumber+"\nPublication date: "+timeStamp.format(publicationDate.getTime());
+			alert="A random book was register sucesfully with the following data:\nIndentifier: "+indentifier+"\nName:"+name+"\nNumber of pages: "+pagesNumber+"\nPublication date: "+timeStamp.format(publicationDate.getTime());
 		}else{
 			Magazine newmagazine=new Magazine(indentifier,name,pagesNumber,publicationDate,"RandomMagazines.com",2,20,2,2);
 			bibliographic.add(newmagazine);
@@ -433,7 +437,7 @@ public class ReadXCompany{
 		if(opuse==1){
 			Regular newUser=new Regular(nameUser, idUser, registerDate,1);
 			users.add(newUser);
-			alert="A regular user was register sucesfully with the follow data:\nName: "+nameUser+"\nId User: "+idUser+"\nRegister date: "+timeStamp.format(registerDate.getTime());
+			alert="A regular user was register sucesfully with the following data:\nName: "+nameUser+"\nId User: "+idUser+"\nRegister date: "+timeStamp.format(registerDate.getTime());
 		}else{
 			Premium newUser=new Premium(nameUser, idUser, registerDate,2,"RandomNickName","12345");
 			users.add(newUser);
@@ -617,13 +621,15 @@ public class ReadXCompany{
 	* @return A boolean indicating whether or not the product was successfully acquired by the user.
 	*/
 	public boolean searchAcquireProduct(String indentifier,String idUser){
-		boolean found;
+		BibliographicProduct obj;
 		User user=searchUser(idUser);
+		boolean found=false;
 		BibliographicProduct product=searchProduct(indentifier);
 		if(product!=null){
-			found=user.acquireProuct(product);
-		}else{
-			found=false;
+			obj=user.searchAcquireProduct(product);
+			if(obj!=null){
+				found=true;
+			}
 		}
 		return found;
 	}
@@ -671,7 +677,7 @@ public class ReadXCompany{
 		BibliographicProduct product=searchProduct(indentifier);
 		if(user!=null){
 			if(product!=null){
-				alert=user.countSimulateReading(product,pag);
+				alert="Reading page "+pag+" of "+product.getPagesNumber()+"\n";
 			}
 		}
 		return alert;
