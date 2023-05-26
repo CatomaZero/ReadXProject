@@ -55,11 +55,16 @@ public class Section{
 	*/
 	public void acquireProuct(BibliographicProduct product){
 		boolean acquire=false;
-		for(int i=0; i<purchasedProducts.length&&!acquire;i++){
-			for(int k=0;k<purchasedProducts[0].length&&!acquire;k++){
-				if(purchasedProducts[i][k]==null){
-					purchasedProducts[i][k]=product;
-					acquire=true;
+		if(verification(product)){
+			publicationDateVerification(product);
+		}else{
+			for(int i=0; i<purchasedProducts.length&&!acquire;i++){
+				for(int k=0;k<purchasedProducts[0].length&&!acquire;k++){
+					if(purchasedProducts[i][k]==null){
+						System.out.println("Se agrego este producto: " + product.getIndentifier());
+						purchasedProducts[i][k]=product;
+						acquire=true;
+					}
 				}
 			}
 		}
@@ -89,12 +94,26 @@ public class Section{
 	}
 	public String productsLibrary(){
 		String alert="";
-		for(int i=0; i<purchasedProducts.length;i++){
-			for(int k=0;k<purchasedProducts[0].length;k++){
-				if(purchasedProducts[i][k]!=null){
-					alert+=purchasedProducts[i][k].getIndentifier()+"\n";
+		alert += "       0     1     2     3     4   \n    ";
+		for (int i = 0; i <purchasedProducts[0].length; i++){
+			alert+=("------");
+		}
+		alert+="\n";
+		for (int i=0; i<purchasedProducts.length; i++) {
+			alert+=String.format("%-2d", i)+"  ";    
+			for (int j=0; j< purchasedProducts[0].length;j++) {
+				if(purchasedProducts[i][j]!=null){
+					alert+="| " + purchasedProducts[i][j].getIndentifier() + " ";
+				}else{
+					alert+="| " + "---" + " ";
 				}
 			}
+			alert+="|\n"; 
+			alert+="    ";
+			for (int j = 0; j < purchasedProducts[0].length; j++) {
+				alert+="------";
+			}
+			alert+="\n";
 		}
 		return alert;
 	}
@@ -102,5 +121,52 @@ public class Section{
 		String alert;
 		alert="Reading session in progress:\n\nReading:"+product.getName()+"\n";
 		return alert;
+	}
+	public void publicationDateVerification(BibliographicProduct product){
+		boolean perm=true;
+		boolean finished=false;
+		BibliographicProduct pastProduct=null;
+		for(int i=0; i<purchasedProducts.length&&!finished;i++){
+			for(int k=0;k<purchasedProducts[0].length&&!finished;k++){
+				if(perm){
+					pastProduct=purchasedProducts[i][k];
+				}
+				if(purchasedProducts[i][k]!=null&&product.getPublicationDate().before(pastProduct.getPublicationDate())){
+					System.out.println("product que se metera en la casilla: "+product.getIndentifier());
+					purchasedProducts[i][k]=product;
+					product=pastProduct;
+					if(k<4){
+						if(purchasedProducts[i][k+1]!=null){
+							pastProduct=purchasedProducts[i][k+1];
+							purchasedProducts[i][k+1]=null;
+							purchasedProducts[i][k+1]=product;
+						}else{
+							purchasedProducts[i][k+1]=product;
+						}
+					}else if(k==4&&i<4){
+						if(purchasedProducts[i+1][0]!=null){
+							pastProduct=purchasedProducts[i][k+1];
+							purchasedProducts[i+1][0]=null;
+							purchasedProducts[i+1][0]=product;
+						}else{
+							purchasedProducts[i+1][0]=product;
+						}
+					}
+					perm=false;
+					System.out.println("producto que cambiara de casilla: "+pastProduct.getIndentifier());
+				}
+			}
+		}
+	}
+	public boolean verification(BibliographicProduct product){
+		boolean done=false;
+		for(int i=0; i<purchasedProducts.length&&!done;i++){
+			for(int k=0;k<purchasedProducts[0].length&&!done;k++){
+				if(purchasedProducts[i][k]!=null&&product.getPublicationDate().before(purchasedProducts[i][k].getPublicationDate())){
+					done=true;
+				}
+			}
+		}
+		return done;
 	}
 }

@@ -132,4 +132,7 @@ public class BibliographicProduct{
 	public void sumReadingPag(){
 		numReadPages++;
 	}
+	public Calendar getPublicationDate(){
+		return publicationDate;
+	}
 }

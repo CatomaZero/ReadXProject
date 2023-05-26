@@ -267,7 +267,7 @@ public class User{
 				con=library.get(i).getSectionNumber();
 			}
 		}
-		Section newSection=new Section(con);
+		Section newSection=new Section(con+1);
 		library.add(newSection);
 	}
 }
