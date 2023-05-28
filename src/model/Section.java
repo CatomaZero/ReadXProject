@@ -12,14 +12,31 @@ public class Section{
 	//Relations
 	private BibliographicProduct[][] purchasedProducts;
 	
+	/**
+	*
+	*Section Constructor: Initializes a new section with the specified section number.
+	*@param secNumb The section number of the section.
+	*/
 	public Section(int secNumb){
 		sectionNumber=secNumb;
 		
 		purchasedProducts=new BibliographicProduct[MAXPRODUCTSX][MAXPRODUCTSY];
 	}
+	/**
+	*
+	*Get Section Number: Retrieves the section number of the section.
+	*@return The section number.
+	*/
 	public int getSectionNumber(){
 		return sectionNumber;
 	}
+	/**
+	*
+	*Modify User's Product: Modifies a user's purchased product in the section.
+	*<br>Preconditions:<br> The product must exist in the section.
+	*<br>Postconditions:<br> The user's product is modified with the new product data.
+	*@param product The new product data to replace the user's product.
+	*/
 	public void modifyUsersProduct(BibliographicProduct product){
 		boolean modified=false;
 		for(int i=0; i<purchasedProducts.length&&!modified;i++){
@@ -53,6 +70,13 @@ public class Section{
 		}
 		return obj;
 	}
+	/**
+	*
+	*Search Purchased Product: Searches for a purchased product at the specified row and column in the section.
+	*@param row The row index of the purchased product.
+	*@param columns The column index of the purchased product.
+	*@return The purchased product at the specified row and column, or null if it doesn't exist.
+	*/
 	public BibliographicProduct searchPurshased(int row,int columns){
 		BibliographicProduct search=purchasedProducts[row][columns];
 		BibliographicProduct obj=null;
@@ -89,6 +113,11 @@ public class Section{
 			}
 		}
 	}
+	/**
+	* Section Verification: Checks if the section has any available space for purchasing products.
+	*
+	* @return true if there is available space, false otherwise.
+	*/
 	public boolean sectionVerification(){
 		boolean perm=false;
 		for(int i=0; i<purchasedProducts.length&&!perm;i++){
@@ -100,6 +129,12 @@ public class Section{
 		}
 		return perm;
 	}
+	/**
+	* Finish Subscription: Removes the specified product from the purchased products in the section.
+	*
+	* @param product The product to be removed from the purchased products.
+	* @return true if the product was successfully removed, false otherwise.
+	*/
 	public boolean finishSuscription(BibliographicProduct product){
 		boolean done=false;
 		for(int i=0; i<purchasedProducts.length&&!done;i++){
@@ -112,6 +147,11 @@ public class Section{
 		}
 		return done;
 	}
+	/**
+	* Products Library: Generates a string representation of the products in the section.
+	*
+	* @return The string representation of the products in the section.
+	*/
 	public String productsLibrary(){
 		String alert="";
 		alert += "       0     1     2     3     4   \n    ";
@@ -137,11 +177,22 @@ public class Section{
 		}
 		return alert;
 	}
+	/**
+	* Simulate Reading: Simulates a reading session with the specified product.
+	*
+	* @param product The product being read.
+	* @return A string representing the reading session.
+	*/
 	public String simulateReading(BibliographicProduct product){
 		String alert;
 		alert="Reading session in progress:\n\nReading:"+product.getName()+"\n";
 		return alert;
 	}
+	/**
+	* Publication Date Verification: Checks the publication date of the product and rearranges the purchased products accordingly.
+	*
+	* @param product The product to be verified and rearranged.
+	*/
 	public void publicationDateVerification(BibliographicProduct product){
 		boolean perm=true;
 		boolean finished=false;
@@ -176,6 +227,12 @@ public class Section{
 			}
 		}
 	}
+	/**
+	* Verification: Checks if the product should be rearranged based on its publication date.
+	*
+	* @param product The product to be verified.
+	* @return true if the product needs to be rearranged, false otherwise.
+	*/
 	public boolean verification(BibliographicProduct product){
 		boolean done=false;
 		for(int i=0; i<purchasedProducts.length&&!done;i++){

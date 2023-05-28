@@ -132,9 +132,19 @@ public class BibliographicProduct{
 	public void sumReadingPag(){
 		numReadPages++;
 	}
+	/**
+	* Get Publication Date: Returns the publication date of the product.
+	*
+	* @return The publication date of the product.
+	*/
 	public Calendar getPublicationDate(){
 		return publicationDate;
 	}
+	/**
+	* Get Reading Page: Returns the number of pages read.
+	*
+	* @return The number of pages read.
+	*/
 	public int getReadingPag(){
 		return numReadPages;
 	}

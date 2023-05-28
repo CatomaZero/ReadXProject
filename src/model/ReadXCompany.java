@@ -69,7 +69,7 @@ public class ReadXCompany{
 	*@param publicationDate The publication date of the new bibliographic product.
 	*@param url The URL for the new bibliographic product.
 	*@param category The category of the new bibliographic product.
-	*@param subscriptionValue The subscription value for the new bibliographic product.
+	*@param suscriptionValue The subscription value for the new bibliographic product.
 	*@param publicationFrequency The publication frequency for the new bibliographic product.
 	*@param typeBibliographic The type of bibliographic product (book, magazine, or newspaper).
 	*@return A message indicating whether the new bibliographic product was registered successfully or if the specified identifier already exists.
@@ -89,7 +89,7 @@ public class ReadXCompany{
 	/**
 	*
 	*Search a bibliographic product: Searches for a bibliographic product with the given identifier.
-	*@param identifier a string representing the identifier of the bibliographic product to be searched.
+	*@param indentifier a string representing the identifier of the bibliographic product to be searched.
 	*@return a BibliographicProduct object if found, null otherwise.
 	*/
 	public BibliographicProduct searchProduct(String indentifier){
@@ -237,7 +237,7 @@ public class ReadXCompany{
 	* 
 	* <br>Postconditions:<br> The name of the bibliographic product is returned as a String.
 	*
-	* @param identifier The identifier of the bibliographic product to search for.
+	* @param indentifier The identifier of the bibliographic product to search for.
 	* @return The name of the bibliographic product as a String.
 	*/
 	public String imprimBibliographicName(String indentifier){
@@ -396,6 +396,7 @@ public class ReadXCompany{
 	* <br>Postconditions:<br> The list of products in the user's library is returned as a formatted string.
 	*
 	* @param idUser The ID of the user whose library to retrieve.
+	* @param libraryPag A library page
 	* @return A formatted string containing the list of products in the user's library.
 	*/
 	public String productsLibrary(String idUser, int libraryPag){
@@ -636,7 +637,7 @@ public class ReadXCompany{
 	*
 	* <br>Postconditions:<br> If the product is found and acquired by the user, returns true. Otherwise, returns false.
 	*
-	* @param identifier A String representing the identifier of the bibliographic product to search for.
+	* @param indentifier A String representing the identifier of the bibliographic product to search for.
 	* @param idUser A String representing the ID of the user attempting to acquire the product.
 	* @return A boolean indicating whether or not the product was successfully acquired by the user.
 	*/
@@ -660,8 +661,11 @@ public class ReadXCompany{
 	*
 	* <br>Postconditions:<br> If the user and product are found, simulates the user reading the product and returns an alert message. Otherwise, returns an error message indicating the user or product was not found.
 	*
+	* @param op A identifier's product or a matriz position
 	* @param idUser A String representing the ID of the user simulating the reading.
 	* @param identifier A String representing the identifier of the bibliographic product being read.
+	* @param row The row number of the product in the library.
+	* @param columns The column number of the product in the library.
 	* @return A String representing an alert message indicating the success or failure of the simulation.
 	*/
 	public BibliographicProduct searchAcquireProduct(String op,int row,int columns,String idUser,int libraryPag){
@@ -683,6 +687,8 @@ public class ReadXCompany{
 	* <br>Postconditions:<br> If the user and product are found, counts the number of pages simulated and returns an alert message indicating the success of the operation. Otherwise, returns an error message indicating the user or product was not found.
 	*
 	* @param idUser A String representing the ID of the user whose reading is being counted.
+	* @param row The row number of the product in the library.
+	* @param columns The column number of the product in the library.
 	* @param identifier A String representing the identifier of the bibliographic product being read.
 	* @param pag An integer representing the number of pages to count.
 	* @return A String representing an alert message indicating the success or failure of the operation.
@@ -701,9 +707,13 @@ public class ReadXCompany{
 	*
 	* <br>Postconditions:<br> If the product is found, adjusts the current page and updates the product's reading statistics if necessary. Returns the adjusted page number.
 	*
-	* @param op An integer representing the operation to perform on the current page. 1 indicates decrement, 2 indicates increment.
+	* @param option An integer representing the operation to perform on the current page. 1 indicates decrement, 2 indicates increment.
 	* @param pag An integer representing the current page number.
-	* @param opString A String representing the identifier of the bibliographic product being read.
+	* @param op A String representing the identifier of the bibliographic product being read.
+	* @param row An integer representing the row of the product.
+	* @param columns An integer representing the column of the product.
+	* @param idUser A string representing the ID of the user.
+	* @param libraryPag An integer representing the library page of the user.
 	* @return An integer representing the adjusted page number.
 	*/
 	public int count(int option,int pag,String op,int row,int columns,String idUser,int libraryPag){
@@ -719,6 +729,17 @@ public class ReadXCompany{
 		}
 		return pag;
 	}
+	/**
+	*Simulate Reading: Simulates the reading process for a user.
+	*<br>Preconditions:<br> The product must be acquired by the user.
+	*<br>Postconditions:<br> The reading process is simulated based on the given parameters.
+	*@param op A string representing the type of product being read.
+	*@param row An integer representing the row of the product.
+	*@param columns An integer representing the column of the product.
+	*@param idUser A string representing the ID of the user.
+	*@param libraryPag An integer representing the library page of the user.
+	*@return A string representing the alert message for the simulated reading process.
+	*/
 	public String simulateReading(String op,int row,int columns,String idUser,int libraryPag){
 		String alert="";
 		User user=searchUser(idUser);
@@ -726,6 +747,16 @@ public class ReadXCompany{
 		alert="Reading: "+product.getName()+"\n";
 		return alert;
 	}
+	/**
+	*
+	*Generate Reports: Generates various reports.
+	*
+	*<br>Preconditions:<br> None.
+	*
+	*<br>Postconditions:<br> Reports are generated and returned as a string.
+	*
+	*@return A string containing the generated reports.
+	*/
 	public String generateReports(){
 		String alert="";
 		int conMagazine=0;
@@ -746,6 +777,16 @@ public class ReadXCompany{
 		alert+="Subscriptions by category:\n"+suscriptionByCategory()+"\n--------------------\n";
 		return alert;
 	}
+	/**
+	*
+	*Most Read Type: Determines the most read category of magazines and genre of books.
+	*
+	*<br>Preconditions:<br> None.
+	*
+	*<br>Postconditions:<br> The most read category of magazines and genre of books are determined and returned as a string.
+	*
+	*@return A string representing the most read category of magazines and genre of books.
+	*/
 	public String mostReadType(){
 		String alert="";
 		int conVariety=0;
@@ -794,6 +835,16 @@ public class ReadXCompany{
 		}
 		return alert;
 	}
+	/**
+	*
+	*Top Products: Retrieves the top books and magazines based on reading pages.
+	*
+	*<br>Preconditions:<br> None.
+	*
+	*<br>Postconditions:<br> The top books and magazines are determined and returned as a string.
+	*
+	*@return A string containing the top books and magazines based on reading pages.
+	**/
 	public String topProducts() {
 		String alert = "";
 		BibliographicProduct[] topBooks = new BibliographicProduct[5];
@@ -861,6 +912,13 @@ public class ReadXCompany{
 		}
 		return alert;
 	}
+	/**
+	*
+	*Sales by Gender: Retrieves the sales information for each book genre.
+	*<br>Preconditions:<br> None.
+	*<br>Postconditions:<br> The sales information by book genre is determined and returned as a string.
+	*@return A string containing the sales information by book genre.
+	*/
 	public String salesByGender(){
 		String alert="";
 		int conScienceFic=0;
@@ -889,6 +947,16 @@ public class ReadXCompany{
 		alert="Science Fiction:\nBooks sold:"+conScienceFic+" Sales value:"+salesScienceFic+"\nFantasy:\nBooks sold:"+conFantasy+" Sales value:"+salesFantasy+"\nNovel:\nBooks sold:"+conNovel+" Sales value:"+salesNovel;
 		return alert;
 	}
+	/**
+	*
+	*Subscription by Category: Retrieves the subscription information for each magazine category.
+	*
+	*<br>Preconditions:<br> None.
+	*
+	*<br>Postconditions:<br> The subscription information by magazine category is determined and returned as a string.
+	*
+	*@return A string containing the subscription information by magazine category.
+	*/
 	public String suscriptionByCategory(){
 		String alert="";
 		int conVariety=0;

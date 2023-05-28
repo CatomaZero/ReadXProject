@@ -118,12 +118,25 @@ public class Magazine extends BibliographicProduct{
 	public void setSuscriptionValue(double ns){
 		suscriptionValue=ns;
 	}
+	/**
+	* Get Category Type: Returns the category type of the magazine.
+	*
+	* @return The category type of the magazine.
+	*/
 	public CategoryType getCategoryType(){
 		return category;
 	}
+	/**
+	* Eliminate Subscription: Decreases the number of subscriptions by one.
+	*/
 	public void eliminateSuscription(){
 		numSuscriptions--;
 	}
+	/**
+	* Get Number of Subscriptions: Returns the number of subscriptions.
+	*
+	* @return The number of subscriptions.
+	*/
 	public int getNumSuscriptions(){
 		return numSuscriptions;
 	}

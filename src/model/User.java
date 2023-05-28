@@ -103,6 +103,13 @@ public class User{
 		SimpleDateFormat timeStamp = new SimpleDateFormat("dd-MM-yyyy");
 		return nameUser+"   "+idUser+"   "+timeStamp.format(registerDate.getTime())+"   "+userType;
 	}
+	/**
+	*
+	*Modify Users Product: Modifies a bibliographic product for all users in the library.
+	*<br>Preconditions:<br> The product to be modified must exist in the library.
+	*<br>Postconditions:<br> The bibliographic product is modified for all users in the library.
+	*@param product The bibliographic product to be modified.
+	*/
 	public void modifyUsersProduct(BibliographicProduct product){
 		BibliographicProduct obj=searchAcquireProduct(product);
 		if(obj!=null){
@@ -158,6 +165,7 @@ public class User{
 	* Show acquire products: Generates a list of purchased bibliographic products.
 	*
 	* <br>Postconditions:<br> A list of purchased bibliographic products is generated.
+	* @param libraryPag A library pag.
 	*
 	* @return A string containing the identifier of each purchased bibliographic product and an "Enter E to exit" message.
 	*/
@@ -267,6 +275,16 @@ public class User{
 		}
 		return obj;
 	}
+	/**
+	*
+	*Search Acquired Product: Searches for a specific bibliographic product in the library based on its row, column, and library page.
+	*<br>Preconditions:<br> The library page must exist in the library.
+	*<br>Postconditions:<br> The method returns the found bibliographic product if it exists; otherwise, it returns null.
+	*@param row The row number of the product in the library.
+	*@param columns The column number of the product in the library.
+	*@param libraryPag The library page number where the product is located.
+	*@return The found bibliographic product, or null if it does not exist.
+	*/
 	public BibliographicProduct searchAcquireProduct(int row,int columns, int libraryPag){
 		BibliographicProduct obj=null;
 		boolean created=false;
@@ -280,6 +298,13 @@ public class User{
 		}
 		return obj;
 	}
+	/**
+	*
+	*Section Verification: Verifies if any section exists in the library.
+	*<br>Preconditions:<br> None.
+	*<br>Postconditions:<br> The method returns true if at least one section exists in the library; otherwise, it returns false.
+	*@return True if at least one section exists in the library, false otherwise.
+	*/
 	public boolean sectionVerification(){
 		boolean perm=false;
 		for(int i=0; i<library.size()&&!perm;i++){
@@ -287,6 +312,12 @@ public class User{
 		}
 		return perm;
 	}
+	/**
+	*
+	*Create Section: Creates a new section in the library.
+	*<br>Preconditions:<br> None.
+	*<br>Postconditions:<br> A new section is created and added to the library.
+	*/
 	public void createSection(){
 		int con=0;
 		for(int i=0; i<library.size();i++){

@@ -456,18 +456,16 @@ public class ReadXManager{
 		}
 		System.out.println(readx.generateUser(opusers));
 	}
-	
-	public void imprimProduct(){
-		System.out.println("Enter the identifier");
-		String indentifier=lector.next();
-		
-		System.out.println(readx.searchProduct(indentifier).toString());
-	}
-	public void imprimUser(){
-		System.out.println("Enter the user's id");
-		String id=lector.next();
-		System.out.println(readx.searchUser(id).toString());
-	}
+	/**
+	*Simulate Reading: Simulates the reading process for a user.
+	*<br>Preconditions:<br> The product must be acquired by the user.
+	*<br>Postconditions:<br> The reading process is simulated based on the given parameters.
+	*@param op A string representing the type of product being read.
+	*@param row An integer representing the row of the product.
+	*@param columns An integer representing the column of the product.
+	*@param idUser A string representing the ID of the user.
+	*@param libraryPag An integer representing the library page of the user.
+	*/
 	public void simulateReading(String op,int row,int columns,String idUser,int libraryPag){
 		boolean library=true;			
 		if(readx.searchAcquireProduct(op,row,columns,idUser,libraryPag)!=null){
@@ -489,6 +487,11 @@ public class ReadXManager{
 		
 		}
 	}
+	/**
+	*Generate Reports: Generates reports.
+	*<br>Preconditions:<br> None.
+	*<br>Postconditions:<br> Reports are generated and printed.
+	*/
 	public void generateReports(){
 		System.out.println(readx.generateReports());
 	}

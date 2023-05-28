@@ -92,9 +92,19 @@ public class Book extends BibliographicProduct{
 	public void setValue(double nv){
 		value=nv;
 	}
+	/**
+	* Get Gender: Returns the gender of the book.
+	*
+	* @return The gender of the book.
+	*/
 	public GenderType getGender(){
 		return gender;
 	}
+	/**
+	* Get Number Sold: Returns the number of books sold.
+	*
+	* @return The number of books sold.
+	*/
 	public int getNumSold(){
 		return numSold;
 	}
