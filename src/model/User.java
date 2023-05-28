@@ -103,6 +103,16 @@ public class User{
 		SimpleDateFormat timeStamp = new SimpleDateFormat("dd-MM-yyyy");
 		return nameUser+"   "+idUser+"   "+timeStamp.format(registerDate.getTime())+"   "+userType;
 	}
+	public void modifyUsersProduct(BibliographicProduct product){
+		BibliographicProduct obj=searchAcquireProduct(product);
+		if(obj!=null){
+			for(int i=0; i<library.size();i++){
+				if(library!=null){
+					library.get(i).modifyUsersProduct(product);
+				}
+			}
+		}
+	}
 	/**
 	* Acquire a new product: Acquires a new bibliographic product, creates a new billing, and adds them to the user's list of purchases and billings.
 	*
@@ -151,14 +161,18 @@ public class User{
 	*
 	* @return A string containing the identifier of each purchased bibliographic product and an "Enter E to exit" message.
 	*/
-	public String productsLibrary(){
+	public String productsLibrary(int libraryPag){
 		String alert="";
-		for(int i=0;i<library.size();i++){
-			if(library!=null){
-				alert+=library.get(i).productsLibrary();
+		while(alert==""){
+			for(int i=0;i<library.size();i++){
+				if(library.get(i)!=null&&library.get(i).getSectionNumber()==libraryPag){
+					alert+=library.get(i).productsLibrary();
+				}
+			}
+			if(alert==""){
+				createSection();
 			}
 		}
-		alert+="Enter E to exit";
 		return alert;
 	}
 	/**
@@ -246,6 +260,19 @@ public class User{
 		for(int i=0; i<library.size()&&!created;i++){
 			if(library.get(i)!=null){
 				obj=library.get(i).searchPurshased(product);
+				if(obj!=null){
+					created=true;
+				}
+			}
+		}
+		return obj;
+	}
+	public BibliographicProduct searchAcquireProduct(int row,int columns, int libraryPag){
+		BibliographicProduct obj=null;
+		boolean created=false;
+		for(int i=0;i<library.size();i++){
+			if(library.get(i)!=null&&library.get(i).getSectionNumber()==libraryPag){
+				obj=library.get(i).searchPurshased(row,columns);
 				if(obj!=null){
 					created=true;
 				}

@@ -118,4 +118,13 @@ public class Magazine extends BibliographicProduct{
 	public void setSuscriptionValue(double ns){
 		suscriptionValue=ns;
 	}
+	public CategoryType getCategoryType(){
+		return category;
+	}
+	public void eliminateSuscription(){
+		numSuscriptions--;
+	}
+	public int getNumSuscriptions(){
+		return numSuscriptions;
+	}
 }

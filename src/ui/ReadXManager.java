@@ -35,7 +35,7 @@ public class ReadXManager{
 		System.out.println("Welcome to ReadX's app. What do you want to do?");
 		while(status){
 			System.out.println("What do you want to do? Enter an option:");
-			System.out.println("\n1.Manage Bibliographic products.\n2.Register a user.\n3.Acquire a bibliographic product.\n4.Finish a magazine suscription.\n5.See product library.\n6.Generate objects automatically.\n7.Simulate a reading.");
+			System.out.println("\n1.Manage Bibliographic products.\n2.Register a user.\n3.Acquire a bibliographic product.\n4.Finish a magazine suscription.\n5.See product library.\n6.Generate objects automatically.\n7.Simulate a reading.\n8.Generate reports.\n9.Exit");
 			op = lector.nextInt();
 			switch(op){
 				case 1:
@@ -57,16 +57,14 @@ public class ReadXManager{
 					generateObjects();
 					break;
 				case 7:
-					simulateReading();
+					productsLibrary();
 					break;
 				case 8:
-					imprimProduct();
+					generateReports();
 					break;
 				case 9:
-					imprimUser();
-					break;
-				default:
 					status=false;
+					break;
 			}
 		}			
 	}	
@@ -124,6 +122,7 @@ public class ReadXManager{
 				System.out.println("Enter a valid type:\n1.Book.\n2.Magazine.");
 			}
 		}
+		exit=true;
 		lector.nextLine();
 		System.out.println("Enter the identifier");
 		indentifier=lector.nextLine();
@@ -146,29 +145,52 @@ public class ReadXManager{
 		
 		if(typeBibliographic==1){
 			String review;
-			int gender;
+			int gender=0;
 			double value;
 			lector.nextLine();
 			System.out.println("Enter the book's review");
 			review=lector.nextLine();
+			
 			System.out.println("Enter the number of the gender: \n1.Science fiction.\n2.Fantasy.\n3.Historical novel.");
-			gender=lector.nextInt();
+			while(exit){
+				gender=lector.nextInt();
+				if(gender==1||gender==2||gender==3){
+					exit=false;
+				}else{
+					System.out.println("Enter a valid gender: \n1.Science fiction.\n2.Fantasy.\n3.Historical novel.");
+				}
+			}
 			System.out.println("Enter the book's value");
 			value=lector.nextDouble();
 			
 			System.out.println(readx.registerBibliographic(indentifier,name,pagesNumber,publicationDate,url,review,gender,value,typeBibliographic));
 			
 		}else if(typeBibliographic==2){
-			int category;
+			int category=0;
 			double suscriptionValue;
-			int publicationFrequency;
+			int publicationFrequency=0;
 			
 			System.out.println("Enter the number of the category:\n1.Variety.\n2.Desing.\n3.Scientific");
-			category=lector.nextInt();
+			while(exit){
+				category=lector.nextInt();
+				if(category==1||category==2||category==3){
+					exit=false;
+				}else{
+					System.out.println("Enter a valid category:\n1.Variety.\n2.Desing.\n3.Scientific");
+				}
+			}
+			exit=true;
 			System.out.println("Enter the suscription value");
 			suscriptionValue=lector.nextDouble();
 			System.out.println("Enter the publication frequency:\n1.Daily.\n2.Monthly.\n3.Yearly");
-			publicationFrequency=lector.nextInt();
+			while(exit){
+				publicationFrequency=lector.nextInt();
+				if(publicationFrequency==1||publicationFrequency==2||publicationFrequency==3){
+					exit=false;
+				}else{
+					System.out.println("Enter a valid publication frequency:\n1.Daily.\n2.Monthly.\n3.Yearly");
+				}
+			}
 			
 			System.out.println(readx.registerBibliographic(indentifier,name,pagesNumber,publicationDate,url,category,suscriptionValue,publicationFrequency,typeBibliographic));
 			
@@ -322,17 +344,40 @@ public class ReadXManager{
 	*
 	*/
 	public void productsLibrary(){
-		System.out.println("Enter the id of the person who wants to see the library THIS METHOD IS NOT FINISHED ALREADY");
+		System.out.println("Enter the id of the person who wants to see the library");
 		String idUser=lector.next();
 		if(readx.searchUser(idUser)!=null){
+			System.out.println(readx.imprimUserName(idUser));
 			boolean exit=false;
-			int op;
+			int row=0;
+			int columns=0;
+			int libraryPag=1;
+			String op="";
 			while(!exit){
-				System.out.println(readx.imprimUserName(idUser));
-				System.out.println(readx.productsLibrary(idUser));
-				op=lector.nextInt();
-				if(op==3){
+				System.out.println(readx.productsLibrary(idUser,libraryPag));
+				System.out.println("Type the coordinate x, y or the identifier of your product(If you want to usea a coordinate use it like that: 02)\nEnter A for the previous page\nEnter Y for the next page\nType E to exit");
+				op=lector.next();
+				if(op.equalsIgnoreCase("E")){
 					exit=true;
+				}else if(op.length()==3||op.length()==2){
+					if(op.length()==3) {
+						simulateReading(op,row,columns,idUser,libraryPag);
+					}else{
+						String[] coordinates=op.split("");
+						row=Integer.parseInt(coordinates[0]);
+						columns=Integer.parseInt(coordinates[1]);
+						op="";
+						simulateReading(op,row,columns,idUser,libraryPag);
+					}
+				}else if(op.equalsIgnoreCase("Y")){
+					libraryPag=libraryPag+1;
+					System.out.println(libraryPag);
+				}else if(op.equalsIgnoreCase("A")){
+					if(libraryPag>1){
+						libraryPag--;
+					}else{
+						System.out.println("You can not go to the previous page because you are in the first one");
+					}
 				}
 			}
 		}else{
@@ -411,51 +456,7 @@ public class ReadXManager{
 		}
 		System.out.println(readx.generateUser(opusers));
 	}
-	/**
-	*
-	*Simulate readings:Simulates a user reading a bibliographic product.
-	*
-	*<br>Preconditions:<br> The user must exist in the ReadX system.
-	*
-	*<br>Postconditions:<br> The user is able to read the selected *bibliographic product.
-	*
-	*/
-	public void simulateReading(){
-		System.out.println("Enter the id of the user who wants to do the reading");
-		String idUser=lector.next();
-		if(readx.searchUser(idUser)!=null){
-			boolean library=true;
-			while(library){
-				System.out.println(readx.imprimUserName(idUser)+"\nEnter the indentifier of the bibliographic product you want to read");
-				System.out.println(readx.productsLibrary(idUser));
-				String opString=lector.next();
-				if(opString.equalsIgnoreCase("E")){
-					library=false;
-				}else{
-					if(readx.searchAcquireProduct(opString,idUser)){
-						System.out.println("Reading initialized\n");
-						int op=2;
-						int pag=0;
-						boolean reading=true;
-						while(reading){
-							System.out.println(readx.simulateReading(idUser,opString));
-							pag=readx.count(op,pag,opString); 
-							System.out.println(readx.countSimulateReading(idUser, opString,pag)+"\nEnter 1 to go to the previous page.\nEnter 2 to go to the next page.\nEnter 3 to return to library.");
-							op=lector.nextInt();
-							if(op==3){
-								reading=false;
-							}
-						}
-					}else{
-						System.out.println("This product has not been purchased yet");
-					}
-					
-				}
-			}
-		}else{
-			System.out.println("User not founded");
-		}
-	}
+	
 	public void imprimProduct(){
 		System.out.println("Enter the identifier");
 		String indentifier=lector.next();
@@ -466,5 +467,29 @@ public class ReadXManager{
 		System.out.println("Enter the user's id");
 		String id=lector.next();
 		System.out.println(readx.searchUser(id).toString());
+	}
+	public void simulateReading(String op,int row,int columns,String idUser,int libraryPag){
+		boolean library=true;			
+		if(readx.searchAcquireProduct(op,row,columns,idUser,libraryPag)!=null){
+			System.out.println("Reading initialized\n");
+			int option=2;
+			int pag=0;
+			boolean reading=true;
+			while(reading){
+				System.out.println(readx.simulateReading(op,row,columns,idUser,libraryPag));
+				pag=readx.count(option,pag,op,row,columns,idUser,libraryPag); 
+				System.out.println(readx.countSimulateReading(op,row,columns,idUser,pag,libraryPag)+"\nEnter 1 to go to the previous page.\nEnter 2 to go to the next page.\nEnter 3 to return to library.");
+				option=lector.nextInt();
+				if(option==3){
+					reading=false;
+				}
+			}
+		}else{
+			System.out.println("This product has not been purchased yet");
+		
+		}
+	}
+	public void generateReports(){
+		System.out.println(readx.generateReports());
 	}
 }

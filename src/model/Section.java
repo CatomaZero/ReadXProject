@@ -20,6 +20,17 @@ public class Section{
 	public int getSectionNumber(){
 		return sectionNumber;
 	}
+	public void modifyUsersProduct(BibliographicProduct product){
+		boolean modified=false;
+		for(int i=0; i<purchasedProducts.length&&!modified;i++){
+			for(int k=0;k<purchasedProducts[i].length&&!modified;k++){
+				if(purchasedProducts[i][k]!=null&&product.getIndentifier().equalsIgnoreCase(purchasedProducts[i][k].getIndentifier())){
+					purchasedProducts[i][k]=product;
+					modified=true;
+				}
+			}
+		}
+	}
 	/**
 	* Search a bibliographic product acquire: Searches for a purchased BibliographicProduct with the same identifier as the specified BibliographicProduct.
 	*
@@ -42,6 +53,16 @@ public class Section{
 		}
 		return obj;
 	}
+	public BibliographicProduct searchPurshased(int row,int columns){
+		BibliographicProduct search=purchasedProducts[row][columns];
+		BibliographicProduct obj=null;
+		if(search!=null){
+			obj=purchasedProducts[row][columns];
+		}else{
+			obj=null;
+		}
+		return obj;
+	}
 	/**
 	* Comprobation of user's acquire products: Determines if the given bibliographic product has been purchased by the user.
 	*
@@ -61,7 +82,6 @@ public class Section{
 			for(int i=0; i<purchasedProducts.length&&!acquire;i++){
 				for(int k=0;k<purchasedProducts[0].length&&!acquire;k++){
 					if(purchasedProducts[i][k]==null){
-						System.out.println("Se agrego este producto: " + product.getIndentifier());
 						purchasedProducts[i][k]=product;
 						acquire=true;
 					}
@@ -132,7 +152,6 @@ public class Section{
 					pastProduct=purchasedProducts[i][k];
 				}
 				if(purchasedProducts[i][k]!=null&&product.getPublicationDate().before(pastProduct.getPublicationDate())){
-					System.out.println("product que se metera en la casilla: "+product.getIndentifier());
 					purchasedProducts[i][k]=product;
 					product=pastProduct;
 					if(k<4){
@@ -153,7 +172,6 @@ public class Section{
 						}
 					}
 					perm=false;
-					System.out.println("producto que cambiara de casilla: "+pastProduct.getIndentifier());
 				}
 			}
 		}

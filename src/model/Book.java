@@ -92,4 +92,10 @@ public class Book extends BibliographicProduct{
 	public void setValue(double nv){
 		value=nv;
 	}
+	public GenderType getGender(){
+		return gender;
+	}
+	public int getNumSold(){
+		return numSold;
+	}
 }

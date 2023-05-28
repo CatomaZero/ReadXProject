@@ -135,4 +135,7 @@ public class BibliographicProduct{
 	public Calendar getPublicationDate(){
 		return publicationDate;
 	}
+	public int getReadingPag(){
+		return numReadPages;
+	}
 }

@@ -3,6 +3,9 @@ import java.util.Calendar;
 import java.util.ArrayList;
 import java.util.Random;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
+import java.util.Comparator;
+
 
 public class ReadXCompany{
 	//Atributes
@@ -130,10 +133,18 @@ public class ReadXCompany{
 		if(product!=null){
 			product.setName(newName);
 			alert="The bibliographic product's name was changed sucesfully to "+product.getName();
+			modifyUsersProduct(product);
 		}else{
 			alert="The name could not be changed";
 		}
 		return alert;
+	}
+	public void modifyUsersProduct(BibliographicProduct product){
+		for(int i=0; i<users.size();i++){
+			if(users.get(i)!=null){
+				users.get(i).modifyUsersProduct(product);
+			}
+		}
 	}
 	/**
 	*
@@ -366,6 +377,8 @@ public class ReadXCompany{
 		if(product!=null&&product instanceof Magazine){
 			done=user.finishSuscription(product);
 			if(done){
+				Magazine obj=(Magazine) product;
+				obj.eliminateSuscription();
 				alert="The suscription to "+product.getName()+" was finished sucesfully";
 			}else{
 				alert="You have not a suscription to "+product.getName();
@@ -385,11 +398,11 @@ public class ReadXCompany{
 	* @param idUser The ID of the user whose library to retrieve.
 	* @return A formatted string containing the list of products in the user's library.
 	*/
-	public String productsLibrary(String idUser){
+	public String productsLibrary(String idUser, int libraryPag){
 		String alert="";
 		User user=searchUser(idUser);
 		alert="\n"+user.getName()+"'s library\n";
-		alert+=user.productsLibrary();
+		alert=user.productsLibrary(libraryPag);
 		return alert;
 	}
 	/**
@@ -407,12 +420,13 @@ public class ReadXCompany{
 		String name=generateRandomName();
 		int pagesNumber=generateRandomPagesNumber();
 		Calendar publicationDate=generateRandomPublicationDate();
+		int numCategoryOrGender=generateRandomNumCatGen();
 		if(opbi==1){
-			Book newbook=new Book(indentifier,name,pagesNumber,publicationDate,"RandomBooks.com","Random review, random review",2,50,1);
+			Book newbook=new Book(indentifier,name,pagesNumber,publicationDate,"RandomBooks.com","Random review, random review",numCategoryOrGender,50,1);
 			bibliographic.add(newbook);
 			alert="A random book was register sucesfully with the following data:\nIndentifier: "+indentifier+"\nName:"+name+"\nNumber of pages: "+pagesNumber+"\nPublication date: "+timeStamp.format(publicationDate.getTime());
 		}else{
-			Magazine newmagazine=new Magazine(indentifier,name,pagesNumber,publicationDate,"RandomMagazines.com",2,20,2,2);
+			Magazine newmagazine=new Magazine(indentifier,name,pagesNumber,publicationDate,"RandomMagazines.com",numCategoryOrGender,20,2,2);
 			bibliographic.add(newmagazine);
 			alert="A random magazine was register sucesfully with the follow data:\nIndentifier: "+indentifier+"\nName:"+name+"\nNumber of pages: "+pagesNumber+"\nPublication date: "+timeStamp.format(publicationDate.getTime());			
 		}
@@ -506,6 +520,12 @@ public class ReadXCompany{
 		Random random = new Random();
 		pagesNumber = random.nextInt(1000);
 		return pagesNumber;
+	}
+	public int generateRandomNumCatGen(){
+		int numCatorGen;
+		Random random = new Random();
+		numCatorGen = random.nextInt(3)+1; 
+		return numCatorGen;
 	}
 	/**
 	* Generate random product's publication date: Generates a random publication date for a bibliographic product.
@@ -644,20 +664,16 @@ public class ReadXCompany{
 	* @param identifier A String representing the identifier of the bibliographic product being read.
 	* @return A String representing an alert message indicating the success or failure of the simulation.
 	*/
-	public String simulateReading(String idUser, String indentifier){
-		String alert="";
+	public BibliographicProduct searchAcquireProduct(String op,int row,int columns,String idUser,int libraryPag){
 		User user=searchUser(idUser);
-		BibliographicProduct product=searchProduct(indentifier);
-		if(user!=null){
-			if(product!=null){
-				alert=user.simulateReading(product);
-			}else{
-				alert="Bibliographic product not found";
-			}
+		BibliographicProduct productSearch=null;
+		if(op!=""){
+			BibliographicProduct product=searchProduct(op);
+			productSearch=user.searchAcquireProduct(product);
 		}else{
-			alert="User not found";
+			productSearch=user.searchAcquireProduct(row,columns,libraryPag);
 		}
-		return alert;
+		return productSearch;
 	}
 	/**
 	* Number of pages watched: Counts the number of pages a user has simulated reading in a bibliographic product.
@@ -671,15 +687,11 @@ public class ReadXCompany{
 	* @param pag An integer representing the number of pages to count.
 	* @return A String representing an alert message indicating the success or failure of the operation.
 	*/
-	public String countSimulateReading(String idUser,String indentifier,int pag){
+	public String countSimulateReading(String op,int row,int columns,String idUser,int pag,int libraryPag){
 		String alert="";
 		User user=searchUser(idUser);
-		BibliographicProduct product=searchProduct(indentifier);
-		if(user!=null){
-			if(product!=null){
-				alert="Reading page "+pag+" of "+product.getPagesNumber()+"\n";
-			}
-		}
+		BibliographicProduct product=searchAcquireProduct(op,row,columns,idUser,libraryPag);
+		alert="Reading page "+pag+" of "+product.getPagesNumber()+"\n";
 		return alert;
 	}
 	/**
@@ -694,11 +706,11 @@ public class ReadXCompany{
 	* @param opString A String representing the identifier of the bibliographic product being read.
 	* @return An integer representing the adjusted page number.
 	*/
-	public int count(int op,int pag,String opString){
-		BibliographicProduct product=searchProduct(opString);
-		if(op==1){
+	public int count(int option,int pag,String op,int row,int columns,String idUser,int libraryPag){
+		BibliographicProduct product=searchAcquireProduct(op,row,columns,idUser,libraryPag);
+		if(option==1){
 			pag=pag-1;
-		}else if(op==2){
+		}else if(option==2&&product.getPagesNumber()>pag){
 			pag=pag+1;
 			product.sumReadingPag();
 		}
@@ -706,5 +718,203 @@ public class ReadXCompany{
 			pag=1;
 		}
 		return pag;
+	}
+	public String simulateReading(String op,int row,int columns,String idUser,int libraryPag){
+		String alert="";
+		User user=searchUser(idUser);
+		BibliographicProduct product=searchAcquireProduct(op,row,columns,idUser,libraryPag);
+		alert="Reading: "+product.getName()+"\n";
+		return alert;
+	}
+	public String generateReports(){
+		String alert="";
+		int conMagazine=0;
+		int conBook=0;
+
+		for(int i=0;i<bibliographic.size();i++){
+			BibliographicProduct product=bibliographic.get(i);
+			if(product instanceof Magazine){
+				conMagazine+=product.getReadingPag();
+			}else if(product instanceof Book){
+				conBook+=product.getReadingPag();
+			}
+		}
+		alert="--------------------\nPages of books and magazines read:\nMagazine: "+conMagazine+" Book: "+conBook+"\n--------------------\n";
+		alert+="Genre of book and category of most read magazine:\n"+mostReadType()+"\n--------------------\n";
+		alert+="Top 5 books and magazines:\n"+topProducts()+"--------------------\n";
+		alert+="Sales by book genre:\n"+salesByGender()+"\n--------------------\n";
+		alert+="Subscriptions by category:\n"+suscriptionByCategory()+"\n--------------------\n";
+		return alert;
+	}
+	public String mostReadType(){
+		String alert="";
+		int conVariety=0;
+		int conDesing=0;
+		int conScientific=0;
+		int conScienceFic=0;
+		int conFantasy=0;
+		int conNovel=0;
+
+		for(int i=0;i<bibliographic.size();i++){
+			BibliographicProduct obj=bibliographic.get(i);
+			if(obj instanceof Magazine){
+				Magazine product=(Magazine) obj;
+				if(product.getCategoryType()==CategoryType.VARIETY){
+					conVariety+=obj.getReadingPag();
+				}else if(product.getCategoryType()==CategoryType.DESIGN){
+					conDesing+=obj.getReadingPag();
+				}else if(product.getCategoryType()==CategoryType.SCIENTIFIC){
+					conScientific+=obj.getReadingPag();
+				}
+			}else if(obj instanceof Book){
+				Book product=(Book) obj;
+				if(product.getGender()==GenderType.SCIENCE_FICTION){
+					conScienceFic+=obj.getReadingPag();
+				}else if(product.getGender()==GenderType.FANTASY){
+					conFantasy+=obj.getReadingPag();
+				}else if(product.getGender()==GenderType.HISTORICAL_NOVEL){
+					conNovel+=obj.getReadingPag();
+				}
+			}
+		}
+		if(conVariety>conDesing&&conVariety>conScientific){
+			alert="Variety: "+conVariety;
+		}else if(conDesing>conVariety&&conDesing>conScientific){
+			alert="Desing: "+conDesing;
+		}else if(conScientific>conVariety&&conScientific>conDesing){
+			alert="Scientific: "+conScientific;
+		}
+		alert+="\n";
+		if(conScienceFic>conFantasy&&conScienceFic>conNovel){
+			alert+="Science fiction: "+conScienceFic;
+		}else if(conFantasy>conScienceFic&&conFantasy>conNovel){
+			alert+="Fantasy: "+conFantasy;
+		}else if(conNovel>conScienceFic&&conNovel>conFantasy){
+			alert+="Historical novel: "+conNovel;
+		}
+		return alert;
+	}
+	public String topProducts() {
+		String alert = "";
+		BibliographicProduct[] topBooks = new BibliographicProduct[5];
+		BibliographicProduct[] topMagazines = new BibliographicProduct[5];
+		int canPages;
+
+		for (int i = 0; i < bibliographic.size(); i++) {
+			BibliographicProduct obj = bibliographic.get(i);
+			canPages = obj.getReadingPag();
+			if (obj instanceof Magazine) {
+				for (int j = 0; j < topMagazines.length; j++) {
+					if (topMagazines[j] == null) {
+						topMagazines[j] = obj;
+						break;
+					} else if (topMagazines[j].getReadingPag() < canPages) {
+						if (j < 4) {
+							for (int k = 3; k >= j; k--) {
+								topMagazines[k + 1] = topMagazines[k];
+							}
+							topMagazines[j] = obj;
+							break;
+						} else {
+							topMagazines[j] = obj;
+							break;
+						}
+					}
+				}
+			} else if (obj instanceof Book) {
+				for (int j = 0; j < topBooks.length; j++) {
+					if (topBooks[j] == null) {
+						topBooks[j] = obj;
+						break;
+					} else if (topBooks[j].getReadingPag() < canPages) {
+						if (j < 4) {
+							for (int k = 3; k >= j; k--) {
+								topBooks[k + 1] = topBooks[k];
+							}
+							topBooks[j] = obj;
+							break;
+						} else {
+							topBooks[j] = obj;
+							break;
+						}
+					}
+				}
+			}
+		}
+		alert += "Top Magazines:\n";
+		for (int i = 0; i < topMagazines.length; i++) {
+			if (topMagazines[i] != null) {
+				Magazine product = (Magazine) topMagazines[i];
+				alert +="Name: "+ topMagazines[i].getName() + " Category: " + product.getCategoryType() + " Reading pages: " + topMagazines[i].getReadingPag() + "\n";
+			} else {
+				alert += "----\n";
+			}	
+		}	
+		alert += "Top books:\n";
+		for (int i = 0; i < topBooks.length; i++) {
+			if (topBooks[i] != null) {
+				Book product = (Book) topBooks[i];
+				alert +="Name: "+topBooks[i].getName() + " Gender: " +product.getGender()+ " Reading pages: " + topBooks[i].getReadingPag() + "\n";
+			} else {
+				alert += "----\n";
+			}
+		}
+		return alert;
+	}
+	public String salesByGender(){
+		String alert="";
+		int conScienceFic=0;
+		double salesScienceFic=0;
+		int conFantasy=0;
+		double salesFantasy=0;
+		int conNovel=0;
+		double salesNovel=0;
+		
+		for (int i = 0; i < bibliographic.size(); i++) {
+			BibliographicProduct obj = bibliographic.get(i);
+			if(obj instanceof Book){
+				Book product=(Book) obj;
+				if(product.getGender()==GenderType.SCIENCE_FICTION){
+					conScienceFic+=product.getNumSold();
+					salesScienceFic+=product.getValue();
+				}else if(product.getGender()==GenderType.FANTASY){
+					conFantasy+=product.getNumSold();
+					salesFantasy+=product.getValue();
+				}else if(product.getGender()==GenderType.HISTORICAL_NOVEL){
+					conNovel+=product.getNumSold();
+					salesNovel+=product.getValue();
+				}
+			}
+		}
+		alert="Science Fiction:\nBooks sold:"+conScienceFic+" Sales value:"+salesScienceFic+"\nFantasy:\nBooks sold:"+conFantasy+" Sales value:"+salesFantasy+"\nNovel:\nBooks sold:"+conNovel+" Sales value:"+salesNovel;
+		return alert;
+	}
+	public String suscriptionByCategory(){
+		String alert="";
+		int conVariety=0;
+		double salesVariety=0;
+		int conDesing=0;
+		double salesDesing=0;
+		int conScientific=0;
+		double salesScience=0;
+		
+		for (int i = 0; i < bibliographic.size(); i++) {
+			BibliographicProduct obj = bibliographic.get(i);
+			if(obj instanceof Magazine){
+				Magazine product=(Magazine) obj;
+				if(product.getCategoryType()==CategoryType.VARIETY){
+					conVariety+=product.getNumSuscriptions();
+					salesVariety+=product.getSuscriptionValue();
+				}else if(product.getCategoryType()==CategoryType.DESIGN){
+					conDesing+=product.getNumSuscriptions();
+					salesDesing+=product.getSuscriptionValue();
+				}else if(product.getCategoryType()==CategoryType.SCIENTIFIC){
+					conScientific+=product.getNumSuscriptions();
+					salesScience+=product.getSuscriptionValue();
+				}
+			}
+		}
+		alert="Variety:\nActive subscriptions:"+conVariety+" Sales value:"+salesVariety+"\nDesing:\nActive subscriptions:"+conDesing+" Sales value:"+salesDesing+"\nScientific:\nActive subscriptions:"+conScientific+" Sales value:"+salesScience;
+		return alert;
 	}
 }
